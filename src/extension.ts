@@ -1,26 +1,63 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode';
+import * as vscode from "vscode";
+import repositoryTemp from "./templates/repository.temp";
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+  let disposable = vscode.commands.registerCommand(
+    "flutter-helper.repository",
+    async () => {
+      const pathQuery = await vscode.window.showInputBox({
+        placeHolder:
+          "Write a relative path for your file like: feature/test/shop",
+        prompt: "Create Repository file.",
+      });
+      const fileName = await vscode.window.showInputBox({
+        placeHolder: "Write your filename",
+      });
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "flutter-helper" is now active!');
+      if (!pathQuery || !fileName) {
+        vscode.window.showErrorMessage(
+          "A path and filename are mandatory to execute this action"
+        );
+        return;
+      }
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('flutter-helper.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from flutter helper!');
-	});
+      const wsedit = new vscode.WorkspaceEdit();
 
-	context.subscriptions.push(disposable);
+      if (vscode.workspace.workspaceFolders) {
+        const wsPath = vscode.workspace.workspaceFolders[0].uri.fsPath;
+        const filePath = vscode.Uri.file(
+          `${wsPath}/${pathQuery}/${fileName}.dart`
+        );
+
+        vscode.window.showInformationMessage(filePath.toString());
+
+        wsedit.createFile(filePath, { ignoreIfExists: false });
+        wsedit.insert(filePath, new vscode.Position(0, 0), repositoryTemp);
+
+        try {
+          await vscode.workspace.applyEdit(wsedit);
+
+          vscode.window.showInformationMessage(
+            `Created a new file: ${filePath}`
+          );
+
+          const openPath = vscode.Uri.file(filePath.path);
+          const doc = await vscode.workspace.openTextDocument(openPath);
+          await vscode.window.showTextDocument(doc);
+        } catch (error: any) {
+          vscode.window.showErrorMessage(
+            `Error creating the file: ${error.message}`
+          );
+        }
+      } else {
+        vscode.window.showInformationMessage(
+          "There is no folder in the workspace"
+        );
+      }
+    }
+  );
+
+  context.subscriptions.push(disposable);
 }
 
-// This method is called when your extension is deactivated
 export function deactivate() {}

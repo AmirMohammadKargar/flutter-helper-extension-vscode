@@ -14,8 +14,8 @@
   "contributes": {
     "commands": [
       {
-        "command": "flutter-helper.helloWorld",
-        "title": "Hello World"
+        "command": "flutter-helper.repository",
+        "title": "Flutter Helper : Repository"
       }
     ]
   },
