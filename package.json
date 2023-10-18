@@ -14,8 +14,8 @@
   "contributes": {
     "commands": [
       {
-        "command": "flutter-helper.repository",
-        "title": "Flutter Helper : Repository"
+        "command": "flutter-helper.createFile",
+        "title": "Flutter Helper : Create File"
       }
     ]
   },

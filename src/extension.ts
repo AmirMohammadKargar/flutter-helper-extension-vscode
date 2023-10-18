@@ -1,15 +1,24 @@
 import * as vscode from "vscode";
-import repositoryTemp from "./templates/repository.temp";
+import { types, typesWithTemp } from "./constant/temp-types";
 
 export function activate(context: vscode.ExtensionContext) {
   let disposable = vscode.commands.registerCommand(
-    "flutter-helper.repository",
+    "flutter-helper.createFile",
     async () => {
+      const options = types.map((label) => ({
+        label,
+        temp: typesWithTemp[label],
+      }));
+      const tempPicked = await vscode.window.showQuickPick(options, {
+        ignoreFocusOut: true,
+      });
+
       const pathQuery = await vscode.window.showInputBox({
         placeHolder:
           "Write a relative path for your file like: feature/test/shop",
         prompt: "Create Repository file.",
       });
+
       const fileName = await vscode.window.showInputBox({
         placeHolder: "Write your filename",
       });
@@ -32,7 +41,7 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.window.showInformationMessage(filePath.toString());
 
         wsedit.createFile(filePath, { ignoreIfExists: false });
-        wsedit.insert(filePath, new vscode.Position(0, 0), repositoryTemp);
+        wsedit.insert(filePath, new vscode.Position(0, 0), tempPicked?.temp!);
 
         try {
           await vscode.workspace.applyEdit(wsedit);
