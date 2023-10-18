@@ -15,7 +15,11 @@
     "commands": [
       {
         "command": "flutter-helper.createFile",
-        "title": "Flutter Helper : Create File"
+        "title": "Flutter Helper : Create Flutter File"
+      },
+      {
+        "command": "flutter-helper.createFeatDir",
+        "title": "Flutter Helper : Create Feature Directory"
       }
     ]
   },
